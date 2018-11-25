@@ -27,8 +27,8 @@ function secure_input($data) {
 		$pass1=secure_input($_POST['pass1']);
 		$pass2=secure_input($_POST['pass2']);
 		if ( !empty($_POST) && $pass1 === $pass2 ){
-				$link = mysqli_connect(localhost, root,Password1, zad7);if(!$link)
-				{ echo"Błąd: ". mysqli_connect_errno()." ".mysqli_connect_error(); }
+				$link = mysqli_connect(localhost, user,Password1, zad7);if(!$link)
+				{ echo"Błąd: ". mysqli_connect_errno()." ".mysqli_connect_error(); exit(); }
 
 				$result = mysqli_query($link, "SELECT * FROM users WHERE user='$user' LIMIT 1");
 				$rekord = mysqli_fetch_array($result);
@@ -36,6 +36,7 @@ function secure_input($data) {
 						$password_status = "<br/><span id='error'>Login zajęty</span>";
 				} else {
 						mysqli_query($link, "INSERT INTO users (user, pass) VALUES ('$user','$pass1')");
+						mkdir("/var/www/utp/zad7/pliki/$user");
 						$password_status="<br/><span id='correct'>Dodano użytkownika</span>";
 				}
 				mysqli_close($link);

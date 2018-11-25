@@ -1,4 +1,5 @@
 <?php
+session_unset();
 // Start the session
 session_start();
 
@@ -15,25 +16,36 @@ if( !empty($_POST) )
 		$pass=secure_input($_POST['pass']);
 		$ipaddress=$_SERVER["REMOTE_ADDR"];
 		$user_agent=$_SERVER["HTTP_USER_AGENT"];
-				$link = mysqli_connect(localhost, root,Password1, zad7);
+				$link = mysqli_connect(localhost, user,Password1, zad7);
 				if(!$link) { echo"Błąd: ". mysqli_connect_errno()." ".mysqli_connect_error(); }
 				
 				$result = mysqli_query($link, "SELECT * FROM users WHERE user='$user' LIMIT 1");
 				
 				$rekord = mysqli_fetch_array($result);
 				//Sprawdź blokadę i sprawdź czas od tej blokady
-				if( $rekord[3] === '1' ){
-						echo "<br/><span id='error'>Nałożono blokadę 1min na konto!</span>";
-						exit();
+				if( $rekord[3] == '1' ){
+						$czas=$rekord[4];
+						$roznica = mysqli_query($link, "SELECT DATEDIFF(second, '$czas', now())");
+						//$roznica = mysqli_fetch_array($roznica);
+						//if($roznica[0] >= 60){
+								echo "<br/><span id='error'>Nałożono blokadę 1min na konto $czas!</span>";
+								exit();
+						//}
+						//mysqli_query($link, "UPDATE users SET blokada=0 WHERE user='$user'");
+						//echo "<br/><span id='error'>Zdjęto blokadę!</span>";
 				}
+				$result = mysqli_query($link, "SELECT * FROM users WHERE user='$user' LIMIT 1");
+				$rekord = mysqli_fetch_array($result);
+				
 				//Jeśli hasło się zgadza to ...
 				if( $rekord[2] === $pass ){
 						$password_status = "<br/><span id='correct'>Zalogowano</span>";
 						$_SESSION["user_name"]=$user;
 						$_SESSION["user_id"]=$rekord[0];
-						mysqli_query($link, "INSERT INTO hostoria_logowan (user_name, time, IP_address, user_agent, correct_login) VALUES ('$user',now(),'$ipaddress', '$user_agent', 'Yes')");
+						mysqli_query($link, "UPDATE users SET blokada=0 WHERE user='$user'");	
+						mysqli_query($link, "INSERT INTO historia_logowan (user_name, time, IP_address, user_agent, correct_login) VALUES ('$user',now(),'$ipaddress', '$user_agent', 'Yes')");
 						$_SESSION['bledne']=0;
-						header("Location: http://utp.mikolajkaja.pl/zad7/panel/");
+						header("Location: http://s4.mikolajkaja.pl/zad7/panel/");
 				}
 				//Jeśli hasło jest błędne to ...
 				else{
@@ -47,7 +59,7 @@ if( !empty($_POST) )
 						$_SESSION['bledne']=$bledne;
 						
 						
-						mysqli_query($link, "INSERT INTO historia_logowan (user_name, time, IP_address, user_agent, correct_login, last_wrong) VALUES ('$user',now(),'$ipaddress', '$user_agent', 'No' )");
+						mysqli_query($link, "INSERT INTO historia_logowan (user_name, time, IP_address, user_agent, correct_login) VALUES ('$user',now(),'$ipaddress', '$user_agent', 'No' )");
 						
 						//Jeśli jest to trzecia błędna próba to dodaj flagę w bazie danych
 								if($bledne === 3){
