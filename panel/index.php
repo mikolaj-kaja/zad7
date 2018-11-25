@@ -43,5 +43,18 @@ require_once('stopka.php');
 		<input type="submit" value="Wyloguj się">
 </form>
 
+
+<?php
+echo '<br/>Wyślij plik<br/>
+<form action="odbierz.php" method="POST" ENCTYPE="multipart/form-data">
+<input type="file" name="plik"/>
+<input type="submit" value="Wyślij plik"/> </form>
+';
+
+echo "<br/>Lista plików<br/>";
+require_once("wyswietl_pliki.php");
+?>
+
+
 </body>
 </html>
