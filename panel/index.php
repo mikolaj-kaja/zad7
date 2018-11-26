@@ -20,6 +20,7 @@ require_once('stopka.php');
 </head>
 <body>
 <?php
+		$folder='';
 		$user = $_SESSION["user_name"];
 		$link = mysqli_connect(localhost, user,Password1, zad7);
 		if(!$link) { echo"Błąd: ". mysqli_connect_errno()." ".mysqli_connect_error(); exit(); }
@@ -47,16 +48,41 @@ require_once('stopka.php');
 <?php
 echo '<br/>Wyślij plik<br/>
 <form method="POST" ENCTYPE="multipart/form-data">
+Wprowadź nazwę folderu: <input type="text" name="folder" value="Nazwa folderu" />
 <input type="file" name="plik"/>
 <input type="hidden" name="wyslano" value="1" />
 <input type="submit" value="Wyślij plik"/> </form>
 ';
 
 if ( isset($_POST['wyslano']) && is_uploaded_file($_FILES['plik']['tmp_name']) ){
-		echo 'Odebrano plik: '.$_FILES['plik']['name'].'<br/>';
-		move_uploaded_file($_FILES['plik']['tmp_name'], "../pliki/$user/".$_FILES['plik']['name']);
+		$folder=$_POST['folder'];
+
+		if($folder !== ''){
+				echo 'Odebrano plik: '.$_FILES['plik']['name'].'<br/>';
+				move_uploaded_file($_FILES['plik']['tmp_name'], "../pliki/$user/$folder/".$_FILES['plik']['name']);
+		}else{
+				echo 'Odebrano plik: '.$_FILES['plik']['name'].'<br/>';
+				move_uploaded_file($_FILES['plik']['tmp_name'], "../pliki/$user/".$_FILES['plik']['name']);
+		}
 } else if(isset($_POST['wyslano'])){
 		echo 'Błąd przy przesyłaniu danych!';
+}
+
+//Utwórz folder
+echo "<br/>
+<form method='POST'>
+Wprowadź nazwę folderu: <input type='text' name='create_folder' value='Nazwa folderu' />
+<input type='submit' value='Utwórz folder' />
+</form>\n";
+
+if( isset($_POST['create_folder']) ){
+		$folder=$_POST['create_folder'];
+		if( !file_exists("../pliki/$user/$folder") ){
+				mkdir("../pliki/$user/$folder");
+				echo "<br/>Folder ".$folder." utworzono pomyślnie!";
+		}else{
+				echo "<br/>Taki folder już istnieje!";
+		}
 }
 
 
