@@ -24,15 +24,17 @@ if( !empty($_POST) )
 				$rekord = mysqli_fetch_array($result);
 				//Sprawdź blokadę i sprawdź czas od tej blokady
 				if( $rekord[3] == '1' ){
-						$czas=$rekord[4];
-						$roznica = mysqli_query($link, "SELECT DATEDIFF(second, '$czas', now())");
-						//$roznica = mysqli_fetch_array($roznica);
-						//if($roznica[0] >= 60){
-								echo "<br/><span id='error'>Nałożono blokadę 1min na konto $czas!</span>";
+						$czas=strtotime($rekord[4]);
+						$czas2=strtotime(date("Y-m-d H:i:s"));
+						$czas3=($czas-$czas2)-3540;
+						if($czas3 < 60 && $czas3 > 0){
+								echo "<br/><span id='error'>Nałożono blokadę $czas3 sekund!</span>";
 								exit();
-						//}
-						//mysqli_query($link, "UPDATE users SET blokada=0 WHERE user='$user'");
-						//echo "<br/><span id='error'>Zdjęto blokadę!</span>";
+						}else{
+								mysqli_query($link, "UPDATE users SET blokada=0 WHERE user='$user'");
+								echo "Zaloguj się jeszcze raz";
+								exit();
+						}
 				}
 				$result = mysqli_query($link, "SELECT * FROM users WHERE user='$user' LIMIT 1");
 				$rekord = mysqli_fetch_array($result);
