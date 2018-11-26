@@ -48,7 +48,7 @@ require_once('stopka.php');
 <?php
 echo '<br/>Wyślij plik<br/>
 <form method="POST" ENCTYPE="multipart/form-data">
-Wprowadź nazwę folderu: <input type="text" name="folder" value="Nazwa folderu" />
+Wprowadź nazwę folderu (puste dla katalogu głównego): <input type="text" name="folder" value="Nazwa folderu" />
 <input type="file" name="plik"/>
 <input type="hidden" name="wyslano" value="1" />
 <input type="submit" value="Wyślij plik"/> </form>
